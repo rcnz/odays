@@ -225,8 +225,6 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleHelper();
 });
 
-
-// 🔧 SAFE DATE PARSER (fixes Safari / iPhone issues)
 function parseDate(str) {
   let parts = str.split(" ");
   let day = parseInt(parts[0]);
@@ -235,8 +233,6 @@ function parseDate(str) {
   return new Date(year, month, day);
 }
 
-
-// 🔥 MAIN ENGINE
 function run() {
 
   let sVal = document.getElementById("start").value;
@@ -251,19 +247,35 @@ function run() {
   let s = parseDate(sVal);
   let c = parseDate(cVal);
 
-  let sequence;
-
-  if (patternValue === "custom442244") {
-    sequence = [4,2,4,2,4,4];
-  } else {
-    let parts = patternValue.split("-");
-    sequence = [parseInt(parts[0]), parseInt(parts[1])];
-  }
-
-  let cycle = sequence.reduce((a, b) => a + b, 0);
+  let parts = patternValue.split("-");
+  let work = parseInt(parts[0]);
+  let off = parseInt(parts[1]);
+  let cycle = work + off;
 
   let html = "";
 
+  let diffToday = Math.floor((c - s) / 86400000);
+  let posToday = ((diffToday % cycle) + cycle) % cycle;
+
+  // 🔥 WORK/OFF POSITION DISPLAY
+  let blockDay;
+  let blockTotal;
+  let blockType;
+
+  if (posToday < work) {
+    blockType = "WORK";
+    blockDay = posToday + 1;
+    blockTotal = work;
+  } else {
+    blockType = "OFF";
+    blockDay = posToday - work + 1;
+    blockTotal = off;
+  }
+
+  document.getElementById("nextOff").innerText =
+    blockType + " Day " + blockDay + " / " + blockTotal;
+
+  // 🔁 DAY STRIP
   for (let i = -3; i <= 4; i++) {
     let d = new Date(c);
     d.setDate(c.getDate() + i);
@@ -271,17 +283,7 @@ function run() {
     let diff = Math.floor((d - s) / 86400000);
     let pos = ((diff % cycle) + cycle) % cycle;
 
-    let total = 0;
-    let type = "off";
-
-    for (let j = 0; j < sequence.length; j++) {
-      total += sequence[j];
-      if (pos < total) {
-        type = (j % 2 === 0) ? "work" : "off";
-        break;
-      }
-    }
-
+    let type = pos < work ? "work" : "off";
     let label = (i === 0) ? type.toUpperCase() : type;
 
     html += "<div class='day " + type + (i===0 ? " today" : "") + "'>" +
@@ -292,30 +294,6 @@ function run() {
 
   document.getElementById("out").innerHTML =
     "<div class='cycle'>" + html + "</div>";
-
-  let next = new Date(c);
-
-  while (true) {
-    let diff = Math.floor((next - s) / 86400000);
-    let pos = ((diff % cycle) + cycle) % cycle;
-
-    let total = 0;
-    let isWork = true;
-
-    for (let j = 0; j < sequence.length; j++) {
-      total += sequence[j];
-      if (pos < total) {
-        isWork = (j % 2 === 0);
-        break;
-      }
-    }
-
-    if (!isWork) break;
-    next.setDate(next.getDate() + 1);
-  }
-
-  document.getElementById("nextOff").innerText =
-    "Next OFF: " + next.toDateString();
 }
 
 </script>
