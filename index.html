@@ -225,6 +225,8 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleHelper();
 });
 
+
+// ✅ Safe date parsing (fixes Safari issues)
 function parseDate(str) {
   let parts = str.split(" ");
   let day = parseInt(parts[0]);
@@ -233,6 +235,8 @@ function parseDate(str) {
   return new Date(year, month, day);
 }
 
+
+// 🔥 MAIN ENGINE
 function run() {
 
   let sVal = document.getElementById("start").value;
@@ -252,15 +256,11 @@ function run() {
   let off = parseInt(parts[1]);
   let cycle = work + off;
 
-  let html = "";
-
+  // 🔥 Calculate today's position
   let diffToday = Math.floor((c - s) / 86400000);
   let posToday = ((diffToday % cycle) + cycle) % cycle;
 
-  // 🔥 WORK/OFF POSITION DISPLAY
-  let blockDay;
-  let blockTotal;
-  let blockType;
+  let blockType, blockDay, blockTotal;
 
   if (posToday < work) {
     blockType = "WORK";
@@ -272,10 +272,13 @@ function run() {
     blockTotal = off;
   }
 
+  // ✅ Display WORK/OFF position
   document.getElementById("nextOff").innerText =
     blockType + " Day " + blockDay + " / " + blockTotal;
 
-  // 🔁 DAY STRIP
+  // 🔁 Build day strip
+  let html = "";
+
   for (let i = -3; i <= 4; i++) {
     let d = new Date(c);
     d.setDate(c.getDate() + i);
@@ -297,6 +300,5 @@ function run() {
 }
 
 </script>
-
 </body>
 </html>
