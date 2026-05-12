@@ -226,6 +226,18 @@ window.addEventListener("DOMContentLoaded", () => {
   toggleHelper();
 });
 
+
+// 🔧 SAFE DATE PARSER (fixes Safari / iPhone issues)
+function parseDate(str) {
+  let parts = str.split(" ");
+  let day = parseInt(parts[0]);
+  let month = new Date(parts[1] + " 1, 2000").getMonth();
+  let year = parseInt(parts[2]);
+  return new Date(year, month, day);
+}
+
+
+// 🔥 MAIN ENGINE
 function run() {
 
   let sVal = document.getElementById("start").value;
@@ -237,8 +249,8 @@ function run() {
   localStorage.setItem("start", sVal);
   localStorage.setItem("pattern", patternValue);
 
-  let s = new Date(sVal);
-  let c = new Date(cVal);
+  let s = parseDate(sVal);
+  let c = parseDate(cVal);
 
   let sequence;
 
@@ -306,6 +318,7 @@ function run() {
   document.getElementById("nextOff").innerText =
     "Next OFF: " + next.toDateString();
 }
+
 </script>
 
 </body>
