@@ -267,13 +267,20 @@ function run() {
     blockTotal = off;
   }
 
-  // ✅ Updated wording here
-  document.getElementById("nextOff").innerText =
-    blockType + " Day " + blockDay + " of " + blockTotal;
+  let banner = document.getElementById("nextOff");
+
+  banner.innerText = blockType + " Day " + blockDay + " of " + blockTotal;
+
+  if (blockType === "WORK") {
+    banner.style.color = "#ff2a2a";
+  } else {
+    banner.style.color = "#00ff99";
+  }
 
   let html = "";
 
   for (let i = -3; i <= 4; i++) {
+
     let d = new Date(c);
     d.setDate(c.getDate() + i);
 
@@ -283,10 +290,35 @@ function run() {
     let type = pos < work ? "work" : "off";
     let label = (i === 0) ? type.toUpperCase() : type;
 
-    html += "<div class='day " + type + (i===0 ? " today" : "") + "'>" +
-            "<div class='day-number'>" + d.getDate() + "</div>" +
-            "<div class='day-label'>" + label + "</div>" +
-            "</div>";
+    let dayName = d.toLocaleDateString("en-US", {
+      weekday: "short"
+    });
+
+    if (i === 0) {
+
+      html += "<div class='day " + type + " today'>" +
+              "<div style='font-size:14px; margin-bottom:2px;'>" +
+              dayName +
+              "</div>" +
+              "<div class='day-number'>" +
+              d.getDate() +
+              "</div>" +
+              "<div class='day-label'>" +
+              label +
+              "</div>" +
+              "</div>";
+
+    } else {
+
+      html += "<div class='day " + type + "'>" +
+              "<div class='day-number'>" +
+              d.getDate() +
+              "</div>" +
+              "<div class='day-label'>" +
+              label +
+              "</div>" +
+              "</div>";
+    }
   }
 
   document.getElementById("out").innerHTML =
