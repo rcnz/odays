@@ -1,179 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <link rel="apple-touch-icon" href="icon.png">
-
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="O-Days">
-<meta charset="UTF-8">
-<title>O-Days</title>
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-<style>
-body {
-  font-family: Arial;
-  background: black;
-  color: white;
-  padding: 18px;
-}
-
-h1 {
-  text-align: center;
-  font-size: 26px;
-}
-
-input, select, button {
-  width: 100%;
-  padding: 16px;
-  margin: 12px 0;
-  font-size: 18px;
-  border-radius: 12px;
-  border: none;
-}
-
-input, select {
-  background: #1c1c1e;
-  color: white;
-}
-
-button {
-  background: #007aff;
-  color: white;
-  font-weight: bold;
-}
-
-.helper {
-  font-size: 13px;
-  opacity: 0.7;
-  margin-top: -8px;
-  margin-bottom: 12px;
-  display: none;
-}
-
-.banner {
-  text-align: center;
-  margin: 10px 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: #00ff99;
-}
-
-.cycle {
-  display: flex;
-  overflow-x: auto;
-  gap: 10px;
-}
-
-.day {
-  width: 90px;
-  padding: 12px;
-  margin: 4px;
-  border-radius: 10px;
-  text-align: center;
-  border: 2px solid #666;
-}
-
-.day-number {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.day-label {
-  font-size: 13px;
-}
-
-.work {
-  background: #8b0000;
-  color: #fff;
-}
-
-.off {
-  background: #00ff99;
-  color: #000;
-  font-weight: bold;
-  box-shadow: 0 0 8px #00ff99;
-}
-
-.work.today {
-  background: #ff2a2a;
-  border: 3px solid #fff;
-  box-shadow: 0 0 14px #ff2a2a;
-}
-
-.off.today {
-  background: #00ff99;
-  border: 3px solid #fff;
-  box-shadow: 0 0 16px #00ff99;
-}
-
-.today .day-number {
-  font-size: 22px;
-}
-
-.today .day-label {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.login {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100vh;
-  text-align: center;
-}
-
-.version {
-  position: fixed;
-  bottom: 5px;
-  right: 10px;
-  font-size: 14px;
-  opacity: 0.7;
-}
-</style>
-
-</head>
-
-<body>
-
-<div id="loginScreen" class="login" style="display:none;">
-  <h2>O-DAYS</h2>
-  <input type="password" id="pw" placeholder="Enter password">
-  <button onclick="checkPassword()">Enter</button>
-</div>
-
-<div id="app" style="display:none;">
-
-<h1>O-DAYS</h1>
-
-<label>Start of Work Block:</label> <input id="start">
-
-<div id="helperText" class="helper">
-  Cycle anchored to your first WORK day of block
-</div>
-
-<label>Pattern:</label> 
-<select id="pattern">
-  <option value="5-3">5 / 3</option>
-  <option value="4-4">4 / 4</option>
-  <option value="3-5">3 / 5</option>
-</select>
-
-<label>Check Date:</label> <input id="check">
-
-<div id="nextOff" class="banner"></div>
-
-<div id="out"></div>
-
-<div class="version">v30</div>
-
-</div>
-
 <script>
 
 const PASSWORD = "123koru";
@@ -267,9 +91,15 @@ function run() {
     blockTotal = off;
   }
 
-  // ✅ Updated wording here
-  document.getElementById("nextOff").innerText =
-    blockType + " Day " + blockDay + " of " + blockTotal;
+  let banner = document.getElementById("nextOff");
+
+  banner.innerText = blockType + " Day " + blockDay + " of " + blockTotal;
+
+  if (blockType === "WORK") {
+    banner.style.color = "#ff2a2a";
+  } else {
+    banner.style.color = "#00ff99";
+  }
 
   let html = "";
 
@@ -283,16 +113,22 @@ function run() {
     let type = pos < work ? "work" : "off";
     let label = (i === 0) ? type.toUpperCase() : type;
 
-    html += "<div class='day " + type + (i===0 ? " today" : "") + "'>" +
-            "<div class='day-number'>" + d.getDate() + "</div>" +
-            "<div class='day-label'>" + label + "</div>" +
-            "</div>";
+    let dayName = d.toLocaleDateString("en-US", { weekday: "short" });
+
+    if (i === 0) {
+      html += "<div class='day " + type + " today'>" +
+              "<div style='font-size:14px; margin-bottom:2px;'>" + dayName + "</div>" +
+              "<div class='day-number'>" + d.getDate() + "</div>" +
+              "<div class='day-label'>" + label + "</div>" +
+              "</div>";
+    } else {
+      html += "<div class='day " + type + "'>" +
+              "<div class='day-number'>" + d.getDate() + "</div>" +
+              "<div class='day-label'>" + label + "</div>" +
+              "</div>";
+    }
   }
 
   document.getElementById("out").innerHTML =
     "<div class='cycle'>" + html + "</div>";
 }
-
-</script>
-</body>
-</html>
